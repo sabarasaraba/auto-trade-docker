@@ -1,5 +1,6 @@
 from binance.client import Client
 import settings
+import math
 
 class BinanceAPI:
 
@@ -16,12 +17,90 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
+    
+    def get_asset(self, symbol):
+        try:
+            value = self.client.get_asset_balance(asset=symbol)
+            return value
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+    
+    def get_account_info(self):
+        try:
+            value = self.client.get_account()
+            return value
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+    
+    def get_sub_account_info(self):
+        try:
+            value = self.client.get_sub_account_list()
+            return value
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+
+    def get_asset_details(self):
+        try:
+            value = self.client.get_asset_details()
+            return value
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+    
+    def place_test_order(self,quantity):
+        try:
+            order = self.client.create_test_order(
+                symbol='BETHETH',
+                side='BUY',
+                type='MARKET',
+                quantity=quantity)
+            return order
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+    
+    def place_beth_order(self,quantity):
+        try:
+            order = self.client.order_market_buy(
+                symbol='BETHETH',
+                quantity=quantity)
+            return order
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+
 
 def main():
     binance_set = BinanceAPI()
+    MIN_ORDER_ETH = 0.005
 
-    ticker = binance_set.get_ticker('BTCUSDT')
+    ticker = binance_set.get_ticker('BETHETH')
+    print ("==BETH→ETH==")
     print (ticker['lastPrice'])
+    
+    current_eth = binance_set.get_asset('ETH')['free']
+    print("==財布の中の今のETH==")
+    print(current_eth)
+
+    # 市場取引ではMIN_ORDER_ETH以上の取引を受け付ける
+    order_min_beth = round(MIN_ORDER_ETH / float(ticker['lastPrice']),5)
+
+    # 最低額以上のETHが溜まっていた場合、BETHにトレードする
+    if float(current_eth) >= order_min_beth:
+        # 小数点以下４桁までのトレードを受け付ける
+        cut_digits_num = 4
+        # 今持っているETHで支払える最大量のBETHを計算
+        order_quantity_beth = math.floor(round(float(current_eth) / float(ticker['lastPrice']),5) * 10 ** cut_digits_num) / (10 ** cut_digits_num)
+
+        print("==購入予定のBETH量==")
+        print(order_quantity_beth)
+        order = binance_set.place_beth_order(order_quantity_beth)
+        print(order)
+    else:
+        print("==ETHが足りないのでBETH買いません==")
 
 if __name__ == '__main__':
     main()
