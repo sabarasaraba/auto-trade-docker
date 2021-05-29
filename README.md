@@ -3,6 +3,24 @@
 マイニングで得た ETH を自動で BETH にするシステムを作るよ。
 ゆくゆくは LINE Bot 通知とかも実装するよ
 
+## 環境構築方法
+
+前提条件：docker が使える環境であること。
+
+1. 本リポジトリを clone してローカルに持ってくる
+2. プロジェクトフォルダ直下(Dockerfile がある場所)で以下コマンドを実行
+
+```
+docker-compose up -d --build
+```
+
+3. 以下コマンドでコンテナ内に入り、Python スクリプトを実行する
+
+```
+docker-compose exec app bash
+python src/main.py # コンテナ内の環境にて実行
+```
+
 ## 参考文献
 
 これで Docker 環境のイメージは掴んだよ
