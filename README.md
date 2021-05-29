@@ -14,11 +14,10 @@
 docker-compose up -d --build
 ```
 
-3. 以下コマンドでコンテナ内に入り、Python スクリプトを実行する
+3. 以下コマンドで Python スクリプトを実行
 
 ```
-docker-compose exec app bash
-python src/main.py # コンテナ内の環境にて実行
+docker-compose exec app python src/main.py
 ```
 
 ## 参考文献
