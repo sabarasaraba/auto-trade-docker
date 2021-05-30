@@ -36,3 +36,11 @@ docker-compose exec app python src/main.py
 掴んだところで poetry で混ぜ込む方法はこっちを参考にしたよ
 
 - https://qiita.com/Aruneko/items/43efd6d7aa8eccc2b77e
+
+python-binance のトレードでの具体的な使い方とかはこれを参考にしたよ
+
+- https://dot-blog.jp/news/binance-api-beginners-haw-to/
+
+BinanceAPI を Postman で呼び出す方法はこれがとてもいいよ。
+
+- https://academy.binance.com/ja/articles/binance-api-series-pt-1-spot-trading-with-postman
