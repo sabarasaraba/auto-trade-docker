@@ -116,15 +116,19 @@ def main():
     latest_mining_amount = binance_set.get_latest_mining_amount()
     print(latest_mining_amount)
     
+    print("==miningウォレットからspotウォレットへの振替実行開始==")
+    transfer_eth_amount = latest_mining_amount
+    transfer = binance_set.transfer_eth_from_pool_to_spot(transfer_eth_amount)
+    
+    # 振替に必要な額が足りない場合、Noneが返却されるのでそれで区別する
+    if transfer is None:
+        print("==本日振替済みなので、振替実施しませんでした==")
+    else:
+        print("==振替完了(振替ETH={0[0]} tranId={0[1]})==".format([transfer_eth_amount,transfer['tranId']]))
+
     current_eth = binance_set.get_asset('ETH')['free']
     print("==財布の中の今のETH==")
     print(current_eth)
-
-    print("==miningウォレットからspotウォレットへの振替実行開始==")
-    # TODO:transfer_eth_amountをMining収益の値に変更する
-    transfer_eth_amount = 0.0001
-    transfer = binance_set.transfer_eth_from_pool_to_spot(transfer_eth_amount)
-    print("==振替完了(振替ETH={0[0]} tranId={0[1]})==".format([transfer_eth_amount,transfer.get('tranId')]))
 
     # 市場取引ではMIN_ORDER_ETH以上の取引を受け付ける
     order_min_beth = round(MIN_ORDER_ETH / float(ticker['lastPrice']),5)
