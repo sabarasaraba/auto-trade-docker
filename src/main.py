@@ -1,6 +1,7 @@
 from ExtendedClient import ExtendedClient as Client
 import settings
 import math
+import time
 
 class BinanceAPI:
 
@@ -83,6 +84,23 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
+    
+    def get_mining_payment_list(self):
+        try:
+            payment_list = self.client.mining_payment_list(
+                algo='ethash',
+                userName='sabara001'
+            )
+            return payment_list
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+    
+    def get_latest_mining_amount(self):
+        payment_list = self.get_mining_payment_list()
+        
+        # 1個目のリストを取得（手抜き。担保されていない気がするけど、多分最新。）
+        return payment_list['data']['accountProfits'][0]['profitAmount']
 
 
 
@@ -94,9 +112,9 @@ def main():
     print ("==BETH→ETH相場==")
     print (ticker['lastPrice'])
 
-    print ("==今日のMining収益==")
-    # TODO:API経由でMining収益データを取得する
-
+    print ("==最新のMining収益(ETH)==")
+    latest_mining_amount = binance_set.get_latest_mining_amount()
+    print(latest_mining_amount)
     
     current_eth = binance_set.get_asset('ETH')['free']
     print("==財布の中の今のETH==")
