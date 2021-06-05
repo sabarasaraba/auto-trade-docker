@@ -44,3 +44,7 @@ python-binance のトレードでの具体的な使い方とかはこれを参�
 BinanceAPI を Postman で呼び出す方法はこれがとてもいいよ。
 
 - https://academy.binance.com/ja/articles/binance-api-series-pt-1-spot-trading-with-postman
+
+Windows での実行用に Docker インストールする際にはこの公式ページを参考にしたよ。
+
+- https://docs.docker.jp/docker-for-windows/install-windows-home.html
