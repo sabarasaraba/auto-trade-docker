@@ -1,4 +1,4 @@
-from binance.client import Client
+from ExtendedClient import ExtendedClient as Client
 import settings
 import math
 
@@ -72,6 +72,19 @@ class BinanceAPI:
             print('Exception Message : {}'.format(e))
             return None
 
+    def transfer_eth_from_pool_to_spot(self,amount):
+        try:
+            transfer = self.client.user_universal_transfer(
+                type='MINING_MAIN',
+                asset='ETH',
+                amount=amount
+            )
+            return transfer
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+
+
 
 def main():
     binance_set = BinanceAPI()
@@ -101,6 +114,11 @@ def main():
         print(order)
     else:
         print("==ETHが足りないのでBETH買いません==")
+    
+    print("**振替テスト**")
+    transfer = binance_set.transfer_eth_from_pool_to_spot(0.001)
+    print(transfer)
+
 
 if __name__ == '__main__':
     main()
