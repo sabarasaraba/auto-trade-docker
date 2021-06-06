@@ -88,8 +88,8 @@ class BinanceAPI:
     def get_mining_payment_list(self):
         try:
             payment_list = self.client.mining_payment_list(
-                algo='ethash',
-                userName='sabara001'
+                algo=settings.MINING_ALGO,
+                userName=settings.MINING_USER_NAME
             )
             return payment_list
         except Exception as e:

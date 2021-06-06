@@ -8,11 +8,13 @@
 前提条件：docker が使える環境であること。
 
 1. 本リポジトリを clone してローカルに持ってくる
-2. BinanceAPI キーを自身のアカウントから取得し、プロジェクトフォルダ直下に.env ファイルとして下記のように作成
+2. BinanceAPI キー・BinancePool におけるマイニングユーザー名を自身のアカウントから取得し、プロジェクトフォルダ直下に.env ファイルとして下記のように作成
 
 ```
 API_KEY = '自身のAPIキーを記載'
 API_SECRET = '自身のAPIシークレットキーを記載'
+MINING_ALGOLISM = 'ETHの場合、ethash BTCの場合、sha256'
+MINING_USER_NAME = 'バイナンスプールでのマイニングユーザー名'
 ```
 
 3. プロジェクトフォルダ直下(Dockerfile がある場所)で以下コマンドを実行
