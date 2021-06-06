@@ -9,3 +9,5 @@ load_dotenv(dotenv_path)
 
 BINANCE_API_KEY = os.environ.get("API_KEY")
 BINANCE_API_SECRET = os.environ.get("API_SECRET")
+MINING_ALGO = os.environ.get("MINING_ALGOLISM")
+MINING_USER_NAME = os.environ.get("MINING_USER_NAME")
