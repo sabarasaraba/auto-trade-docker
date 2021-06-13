@@ -29,6 +29,21 @@ docker-compose up -d --build
 docker-compose exec app python src/main.py
 ```
 
+## 更新反映方法
+
+1. git pull で最新ソースコードを取得
+
+```
+git pull origin master
+```
+
+2. DockerFile 更新内容反映のためイメージ・コンテナの再作成
+
+```
+docker-compose build
+docker-compose up -d
+```
+
 ## 参考文献
 
 これで Docker 環境のイメージは掴んだよ
