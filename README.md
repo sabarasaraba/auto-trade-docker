@@ -29,6 +29,21 @@ docker-compose up -d --build
 docker-compose exec app python src/main.py
 ```
 
+## 更新反映方法
+
+1. git pull で最新ソースコードを取得
+
+```
+git pull origin master
+```
+
+2. DockerFile 更新内容反映のためイメージ・コンテナの再作成
+
+```
+docker-compose build
+docker-compose up -d
+```
+
 ## 参考文献
 
 これで Docker 環境のイメージは掴んだよ
@@ -46,3 +61,7 @@ python-binance のトレードでの具体的な使い方とかはこれを参�
 BinanceAPI を Postman で呼び出す方法はこれがとてもいいよ。
 
 - https://academy.binance.com/ja/articles/binance-api-series-pt-1-spot-trading-with-postman
+
+Windows での実行用に Docker インストールする際にはこの公式ページを参考にしたよ。
+
+- https://docs.docker.jp/docker-for-windows/install-windows-home.html
