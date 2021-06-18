@@ -8,6 +8,7 @@ authors = ["sabarasaraba <sabarasaraba@users.noreply.github.com>"]
 python = "^3.9"
 python-binance = "^1.0.10"
 python-dotenv = "^0.17.1"
+line-bot-sdk = "^1.19.0"
 
 [tool.poetry.dev-dependencies]
 

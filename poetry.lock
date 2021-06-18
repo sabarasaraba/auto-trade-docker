@@ -73,12 +73,32 @@ tzlocal = "*"
 calendars = ["convertdate", "hijri-converter", "convertdate"]
 
 [[package]]
+name = "future"
+version = "0.18.2"
+description = "Clean single-source support for Python 3 and 2"
+category = "main"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
 name = "idna"
 version = "2.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[[package]]
+name = "line-bot-sdk"
+version = "1.19.0"
+description = "LINE Messaging API SDK for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+future = "*"
+requests = ">=2.0"
 
 [[package]]
 name = "multidict"
@@ -231,7 +251,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "5c4ea2e7ece72eea37f8aa833244e06525c311fdbe9faa53a423091637d11055"
+content-hash = "780cf3020f4246d34941f5afdfa24bc79e9a72eed7260b5a2272ac8aaf161f04"
 
 [metadata.files]
 aiohttp = [
@@ -293,9 +313,16 @@ dateparser = [
     {file = "dateparser-1.0.0-py2.py3-none-any.whl", hash = "sha256:17202df32c7a36e773136ff353aa3767e987f8b3e27374c39fd21a30a803d6f8"},
     {file = "dateparser-1.0.0.tar.gz", hash = "sha256:159cc4e01a593706a15cd4e269a0b3345edf3aef8bf9278a57dac8adf5bf1e4a"},
 ]
+future = [
+    {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
+]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
+]
+line-bot-sdk = [
+    {file = "line-bot-sdk-1.19.0.tar.gz", hash = "sha256:11eec8dd5b7afd2fde6c0a1b8031d3aeb1dd19e18b9e36828ad90d1861afd689"},
+    {file = "line_bot_sdk-1.19.0-py2.py3-none-any.whl", hash = "sha256:41bd5cac4b353d9722173893bd99d88e32fd115a22655ad3b3e2040018a4f81c"},
 ]
 multidict = [
     {file = "multidict-5.1.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:b7993704f1a4b204e71debe6095150d43b2ee6150fa4f44d6d966ec356a8d61f"},

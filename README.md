@@ -15,6 +15,8 @@ API_KEY = '自身のAPIキーを記載'
 API_SECRET = '自身のAPIシークレットキーを記載'
 MINING_ALGOLISM = 'ETHの場合、ethash BTCの場合、sha256'
 MINING_USER_NAME = 'バイナンスプールでのマイニングユーザー名'
+LINE_CHANNEL_ACCESS_TOKEN = '通知用LineBotのチャンネルアクセストークン'
+LINE_USER_ID = 'PUSH通知を送るLineアカウントのユーザーID'
 ```
 
 3. プロジェクトフォルダ直下(Dockerfile がある場所)で以下コマンドを実行
@@ -42,6 +44,20 @@ git pull origin master
 ```
 docker-compose build
 docker-compose up -d
+```
+
+## Python モジュール新規追加時反映方法
+
+1. 開発環境ホストマシン上で欲しいモジュールを poetry add で追加する(以下は line-bot-sdk 追加時の例)
+
+```
+poetry add line-bot-sdk
+```
+
+2. 新しいイメージを作成し、コンテナを生成する
+
+```
+docker-compose up -d --build
 ```
 
 ## 参考文献
