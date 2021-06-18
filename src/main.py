@@ -1,7 +1,10 @@
 from ExtendedClient import ExtendedClient as Client
+from linebot import LineBotApi
+from linebot.models import TextSendMessage
 import settings
 import math
 import time
+import datetime
 
 class BinanceAPI:
 
@@ -102,11 +105,34 @@ class BinanceAPI:
         # 1個目のリストを取得（手抜き。担保されていない気がするけど、多分最新。）
         return payment_list['data']['accountProfits'][0]['profitAmount']
 
+class LineBotMessagingApi:
+
+    def __init__(self):
+        LINE_CHANNEL_ACCESS_TOKEN = settings.LINE_CHANNEL_ACCESS_TOKEN
+        
+        self.line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
+    
+    def push_message(self,user_id,message_string):
+        try:
+            messages = TextSendMessage(text=message_string)
+            self.line_bot_api.push_message(user_id, messages=messages)
+            return None
+
+        except Exception as e:
+            print('Exception Message : {}'.format(e))
+            return None
+
 
 
 def main():
     binance_set = BinanceAPI()
     MIN_ORDER_ETH = 0.005
+
+    line_bot = LineBotMessagingApi()
+    
+    # 日本時間のタイムゾーンに合わせたdatetime取得
+    dt_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    result_line_message = dt_now.strftime('%Y年%m月%d日') + "の採掘結果\n"
 
     ticker = binance_set.get_ticker('BETHETH')
     print ("==BETH→ETH相場==")
@@ -115,6 +141,7 @@ def main():
     print ("==最新のMining収益(ETH)==")
     latest_mining_amount = binance_set.get_latest_mining_amount()
     print(latest_mining_amount)
+    result_line_message += "==稼いだETH==\n" + str(latest_mining_amount) + "(〇〇円:未実装)\n"
     
     print("==miningウォレットからspotウォレットへの振替実行開始==")
     transfer_eth_amount = latest_mining_amount
@@ -123,12 +150,15 @@ def main():
     # 振替に必要な額が足りない場合、Noneが返却されるのでそれで区別する
     if transfer is None:
         print("==本日振替済みなので、振替実施しませんでした==")
+        result_line_message += "==振替はしなかったよ==\n"
     else:
         print("==振替完了(振替ETH={0[0]} tranId={0[1]})==".format([transfer_eth_amount,transfer['tranId']]))
+        result_line_message += "==振替成功したよ==\n"
 
     current_eth = binance_set.get_asset('ETH')['free']
     print("==財布の中の今のETH==")
     print(current_eth)
+    result_line_message += "==今のETH保持数==\n" + str(current_eth) + "(〇〇円:未実装)\n"
 
     # 市場取引ではMIN_ORDER_ETH以上の取引を受け付ける
     order_min_beth = round(MIN_ORDER_ETH / float(ticker['lastPrice']),5)
@@ -144,10 +174,14 @@ def main():
         print(order_quantity_beth)
         order = binance_set.place_beth_order(order_quantity_beth)
         print(order)
+        result_line_message += "==BETHこれだけ買うよ==\n" + str(order_quantity_beth) + "\n"
     else:
         print("==ETHが足りないのでBETH買いません==")
-    
+        result_line_message += "==ETHが足りないよ=="
 
+    # 結果をLineBot経由でPUSH通知
+    user_id = settings.LINE_USER_ID
+    line_bot.push_message(user_id, result_line_message)
 
 if __name__ == '__main__':
     main()
