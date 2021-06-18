@@ -46,7 +46,7 @@ docker-compose build
 docker-compose up -d
 ```
 
-## Python モジュール新規追加時反映方法
+## Python モジュール新規追加時反映方法(開発環境で以下を実施後は上の「更新反映方法」を実施すること)
 
 1. 開発環境ホストマシン上で欲しいモジュールを poetry add で追加する(以下は line-bot-sdk 追加時の例)
 
