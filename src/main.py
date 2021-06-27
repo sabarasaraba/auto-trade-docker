@@ -5,6 +5,9 @@ import settings
 import math
 import time
 import datetime
+import csv
+import pandas_datareader.data as pdr
+
 
 class BinanceAPI:
 
@@ -21,7 +24,7 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
-    
+
     def get_asset(self, symbol):
         try:
             value = self.client.get_asset_balance(asset=symbol)
@@ -29,7 +32,7 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
-    
+
     def get_account_info(self):
         try:
             value = self.client.get_account()
@@ -37,7 +40,7 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
-    
+
     def get_sub_account_info(self):
         try:
             value = self.client.get_sub_account_list()
@@ -53,8 +56,8 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
-    
-    def place_test_order(self,quantity):
+
+    def place_test_order(self, quantity):
         try:
             order = self.client.create_test_order(
                 symbol='BETHETH',
@@ -65,8 +68,8 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
-    
-    def place_beth_order(self,quantity):
+
+    def place_beth_order(self, quantity):
         try:
             order = self.client.order_market_buy(
                 symbol='BETHETH',
@@ -76,7 +79,7 @@ class BinanceAPI:
             print('Exception Message : {}'.format(e))
             return None
 
-    def transfer_eth_from_pool_to_spot(self,amount):
+    def transfer_eth_from_pool_to_spot(self, amount):
         try:
             transfer = self.client.user_universal_transfer(
                 type='MINING_MAIN',
@@ -87,7 +90,7 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
-    
+
     def get_mining_payment_list(self):
         try:
             payment_list = self.client.mining_payment_list(
@@ -98,21 +101,22 @@ class BinanceAPI:
         except Exception as e:
             print('Exception Message : {}'.format(e))
             return None
-    
+
     def get_latest_mining_amount(self):
         payment_list = self.get_mining_payment_list()
-        
+
         # 1個目のリストを取得（手抜き。担保されていない気がするけど、多分最新。）
         return payment_list['data']['accountProfits'][0]['profitAmount']
+
 
 class LineBotMessagingApi:
 
     def __init__(self):
         LINE_CHANNEL_ACCESS_TOKEN = settings.LINE_CHANNEL_ACCESS_TOKEN
-        
+
         self.line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
-    
-    def push_message(self,user_id,message_string):
+
+    def push_message(self, user_id, message_string):
         try:
             messages = TextSendMessage(text=message_string)
             self.line_bot_api.push_message(user_id, messages=messages)
@@ -123,37 +127,77 @@ class LineBotMessagingApi:
             return None
 
 
+def get_coin_rate(binance_set, symbol):
+    return float(binance_set.get_ticker(symbol)['lastPrice'])
+
+
+def create_mining_result_list(binance_set, datetime, mining_amount):
+    mining_date = datetime.strftime('%Y-%m-%d')
+
+    if settings.MINING_ALGO == "ethash":
+        coin = "ETH"
+        coin_usd_rate = get_coin_rate(binance_set, 'ETHUSDT')
+
+    elif settings.MINING_ALGO == "sha256":
+        coin = "BCC"
+        coin_usd_rate = get_coin_rate(binance_set, 'BCCUSDT')
+
+    else:
+        coin = "alt(想定外)"
+        coin_usd_rate = 0.0
+
+    df = pdr.get_data_yahoo("JPY=X")
+    # 最新日の始値を取得
+    usd_jpy_rate = df.tail(1).iat[0, 2]
+
+    earned_coin = mining_amount
+
+    earned_jpy = mining_amount * coin_usd_rate * usd_jpy_rate
+
+    return [mining_date, coin, coin_usd_rate, usd_jpy_rate, earned_coin, earned_jpy]
+
 
 def main():
     binance_set = BinanceAPI()
     MIN_ORDER_ETH = 0.005
 
     line_bot = LineBotMessagingApi()
-    
+
     # 日本時間のタイムゾーンに合わせたdatetime取得
-    dt_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    dt_now = datetime.datetime.now(
+        datetime.timezone(datetime.timedelta(hours=9)))
     result_line_message = dt_now.strftime('%Y年%m月%d日') + "の採掘結果\n"
 
-    ticker = binance_set.get_ticker('BETHETH')
-    print ("==BETH→ETH相場==")
-    print (ticker['lastPrice'])
+    beth_rate = get_coin_rate(binance_set, 'BETHETH')
+    print("==BETH→ETH相場==")
+    print(beth_rate)
 
-    print ("==最新のMining収益(ETH)==")
+    print("==最新のMining収益(ETH)==")
     latest_mining_amount = binance_set.get_latest_mining_amount()
     print(latest_mining_amount)
-    result_line_message += "==稼いだETH==\n" + str(latest_mining_amount) + "(〇〇円:未実装)\n"
-    
+    result_line_message += "==稼いだETH==\n" + \
+        str(latest_mining_amount) + "(〇〇円:未実装)\n"
+
     print("==miningウォレットからspotウォレットへの振替実行開始==")
     transfer_eth_amount = latest_mining_amount
     transfer = binance_set.transfer_eth_from_pool_to_spot(transfer_eth_amount)
-    
+
     # 振替に必要な額が足りない場合、Noneが返却されるのでそれで区別する
     if transfer is None:
         print("==本日振替済みなので、振替実施しませんでした==")
         result_line_message += "==振替はしなかったよ==\n"
+
     else:
-        print("==振替完了(振替ETH={0[0]} tranId={0[1]})==".format([transfer_eth_amount,transfer['tranId']]))
+        print("==振替完了(振替ETH={0[0]} tranId={0[1]})==".format(
+            [transfer_eth_amount, transfer['tranId']]))
         result_line_message += "==振替成功したよ==\n"
+
+        # 一日一回の振替時のみ今日の収益結果としてCSV出力
+        mining_result_log = create_mining_result_list(
+            binance_set, dt_now, latest_mining_amount)
+        with open('mining_result.csv', 'a', encoding='utf-8', newline='') as f:
+            csvWriter = csv.writer(f)
+            csvWriter.writerow(mining_result_log)
 
     current_eth = binance_set.get_asset('ETH')['free']
     print("==財布の中の今のETH==")
@@ -161,20 +205,29 @@ def main():
     result_line_message += "==今のETH保持数==\n" + str(current_eth) + "(〇〇円:未実装)\n"
 
     # 市場取引ではMIN_ORDER_ETH以上の取引を受け付ける
-    order_min_beth = round(MIN_ORDER_ETH / float(ticker['lastPrice']),5)
+    order_min_beth = round(MIN_ORDER_ETH / beth_rate, 5)
 
     # 最低額以上のETHが溜まっていた場合、BETHにトレードする
     if float(current_eth) >= order_min_beth:
         # 小数点以下４桁までのトレードを受け付ける
         cut_digits_num = 4
         # 今持っているETHで支払える最大量のBETHを計算
-        order_quantity_beth = math.floor(round(float(current_eth) / float(ticker['lastPrice']),5) * 10 ** cut_digits_num) / (10 ** cut_digits_num)
+        order_quantity_beth = math.floor(round(float(
+            current_eth) / beth_rate, 5) * 10 ** cut_digits_num) / (10 ** cut_digits_num)
 
         print("==購入予定のBETH量==")
         print(order_quantity_beth)
         order = binance_set.place_beth_order(order_quantity_beth)
         print(order)
-        result_line_message += "==BETHこれだけ買うよ==\n" + str(order_quantity_beth) + "\n"
+        result_line_message += "==BETHこれだけ買うよ==\n" + \
+            str(order_quantity_beth) + "\n"
+
+        # CSVにログ残し
+        with open('trading_beth_result.csv', 'a', encoding='utf-8', newline='') as f:
+            csvWriter = csv.writer(f)
+            csvWriter.writerow([dt_now.strftime(
+                '%Y-%m-%d'), beth_rate, order_quantity_beth, beth_rate * order_quantity_beth])
+
     else:
         print("==ETHが足りないのでBETH買いません==")
         result_line_message += "==ETHが足りないよ=="
@@ -182,6 +235,7 @@ def main():
     # 結果をLineBot経由でPUSH通知
     user_id = settings.LINE_USER_ID
     line_bot.push_message(user_id, result_line_message)
+
 
 if __name__ == '__main__':
     main()
