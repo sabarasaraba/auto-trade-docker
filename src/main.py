@@ -195,7 +195,7 @@ def main():
         # 一日一回の振替時のみ今日の収益結果としてCSV出力
         mining_result_log = create_mining_result_list(
             binance_set, dt_now, latest_mining_amount)
-        with open('mining_result.csv', 'a', encoding='utf-8', newline='') as f:
+        with open('.log/mining_result.csv', 'a', encoding='utf-8', newline='') as f:
             csvWriter = csv.writer(f)
             csvWriter.writerow(mining_result_log)
 
@@ -223,7 +223,7 @@ def main():
             str(order_quantity_beth) + "\n"
 
         # CSVにログ残し
-        with open('trading_beth_result.csv', 'a', encoding='utf-8', newline='') as f:
+        with open('.log/trading_beth_result.csv', 'a', encoding='utf-8', newline='') as f:
             csvWriter = csv.writer(f)
             csvWriter.writerow([dt_now.strftime(
                 '%Y-%m-%d'), beth_rate, order_quantity_beth, beth_rate * order_quantity_beth])
