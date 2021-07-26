@@ -146,13 +146,16 @@ def create_mining_result_list(binance_set, datetime, mining_amount):
         coin = "alt(想定外)"
         coin_usd_rate = 0.0
 
-    df = pdr.get_data_yahoo("JPY=X")
-    # 最新日の始値を取得
-    usd_jpy_rate = df.tail(1).iat[0, 2]
+    # 円換算ログ残し機能停止
+    # df = pdr.get_data_yahoo("JPY=X")
+    # # 最新日の始値を取得
+    # usd_jpy_rate = df.tail(1).iat[0, 2]
+    usd_jpy_rate = "dummy"
 
     earned_coin = mining_amount
 
-    earned_jpy = mining_amount * coin_usd_rate * usd_jpy_rate
+    # earned_jpy = mining_amount * coin_usd_rate * usd_jpy_rate
+    earned_jpy = "dummy"
 
     return [mining_date, coin, coin_usd_rate, usd_jpy_rate, earned_coin, earned_jpy]
 
@@ -183,10 +186,13 @@ def main():
     print("==最新のMining収益(ETH)==")
     latest_mining_amount = binance_set.get_latest_mining_amount()
     print(latest_mining_amount)
-    latest_mining_amount_yen = round(convert_eth_jpy(
-        binance_set, latest_mining_amount), 2)
+    # 為替変換機能停止
+    # latest_mining_amount_yen = round(convert_eth_jpy(
+    #     binance_set, latest_mining_amount), 2)
+    # result_line_message += "==稼いだETH==\n" + \
+    #     str(latest_mining_amount) + "(" + str(latest_mining_amount_yen) + "円)\n"
     result_line_message += "==稼いだETH==\n" + \
-        str(latest_mining_amount) + "(" + str(latest_mining_amount_yen) + "円)\n"
+        str(latest_mining_amount) + "(円変換機能停止中)\n"
 
     print("==miningウォレットからspotウォレットへの振替実行開始==")
     transfer_eth_amount = latest_mining_amount
@@ -212,10 +218,13 @@ def main():
     current_eth = binance_set.get_asset('ETH')['free']
     print("==財布の中の今のETH==")
     print(current_eth)
-    current_jpy = round(convert_eth_jpy(
-        binance_set, current_eth), 2)
+    # 為替変換機能停止中
+    # current_jpy = round(convert_eth_jpy(
+    #     binance_set, current_eth), 2)
+    # result_line_message += "==今のETH保持数==\n" + \
+    #     str(current_eth) + "(" + str(current_jpy) + "円)\n"
     result_line_message += "==今のETH保持数==\n" + \
-        str(current_eth) + "(" + str(current_jpy) + "円)\n"
+        str(current_eth) + "(円変換機能停止中)\n"
 
     # 市場取引ではMIN_ORDER_ETH以上の取引を受け付ける
     order_min_beth = round(MIN_ORDER_ETH / beth_rate, 5)
