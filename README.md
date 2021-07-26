@@ -42,6 +42,7 @@ git pull origin master
 2. DockerFile 更新内容反映のためイメージ・コンテナの再作成
 
 ```
+docker-compose down
 docker-compose build
 docker-compose up -d
 ```
@@ -58,6 +59,16 @@ poetry add line-bot-sdk
 
 ```
 docker-compose up -d --build
+```
+
+## 導入済み Python モジュールのバージョンアップ方法(開発環境で以下を実施後は上の「更新反映方法」を実施すること)
+
+1. pyproject.toml 内でアップデートしたいモジュールのバージョンをアップデートバージョンに変更する形で編集する
+
+2. アップデートしたいモジュールのアップデートを実行
+
+```
+poetry update <モジュール名>
 ```
 
 ## 参考文献
@@ -81,3 +92,7 @@ BinanceAPI を Postman で呼び出す方法はこれがとてもいいよ。
 Windows での実行用に Docker インストールする際にはこの公式ページを参考にしたよ。
 
 - https://docs.docker.jp/docker-for-windows/install-windows-home.html
+
+Poetry 管理モジュールのアップデート方法はこのページを参考にしたよ
+
+- https://qiita.com/canonrock16/items/f77ee2a2df9be5b8cc37
